@@ -6,18 +6,21 @@ from selenium import webdriver
 
 def main():
     start = time.time()
-    home = os.path.expanduser('~')
-    chrome_path = os.path.join(home, 'practice', 'chromedriver')
-    phantom_path = os.path.join(home, 'practice', 'phantomjs-2.1.1-macosx/bin/phantomjs')
+    chrome_path = os.path.join(os.getcwd(), 'chromedriver')
+    # phantom_path = os.path.join(home, 'practice', 'phantomjs-2.1.1-macosx/bin/phantomjs')
     # Chrome의 경우 | 아까 받은 chromedriver의 위치를 지정해준다.
-    # driver = webdriver.Chrome(chrome_path)
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+    options.add_argument('window-size=1920x1080')
+    options.add_argument("disable-gpu")
+    driver = webdriver.Chrome(chrome_path, chrome_options=options)
     # driver.implicitly_wait(3)
     # PhantomJS의 경우 | 아까 받은 PhantomJS의 위치를 지정해준다.
-    driver = webdriver.PhantomJS(phantom_path)
+    # driver = webdriver.PhantomJS(phantom_path)
 
     driver.get('http://cafe.naver.com/joonggonara.cafe')
     # 맥북/노트북 탭으로 들어감
-    # driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+    driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
     driver.find_element_by_id('menuLink334').click()
     script = """
     window.myFunc = function() {
@@ -33,6 +36,8 @@ def main():
     print(text)
     driver.close()
     print('total time is {}'.format(time.time() - start))
+
+    return text
 
 
 if __name__ == '__main__':
