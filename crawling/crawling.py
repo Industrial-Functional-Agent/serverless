@@ -4,16 +4,24 @@ import time
 from selenium import webdriver
 
 
-def main():
+def crawling():
+    if True:
+        a = os.popen('ldd -v {}'.format(os.path.join(os.getcwd(), 'headless-chromium'))).read()
+        return a
     start = time.time()
-    chrome_path = os.path.join(os.getcwd(), 'chromedriver')
+    chrome_path = os.path.join(os.getcwd(), 'chromedriver-mac')
     # phantom_path = os.path.join(home, 'practice', 'phantomjs-2.1.1-macosx/bin/phantomjs')
     # Chrome의 경우 | 아까 받은 chromedriver의 위치를 지정해준다.
     options = webdriver.ChromeOptions()
+    options.binary_location = os.path.join(os.getcwd(), 'headless-chromium')
+    # options.binary_location = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
     options.add_argument('headless')
     options.add_argument('window-size=1920x1080')
-    options.add_argument("disable-gpu")
+    options.add_argument('disable-gpu')
+    options.add_argument('single-process')
+    options.add_argument('no-sandbox')
     driver = webdriver.Chrome(chrome_path, chrome_options=options)
+
     # driver.implicitly_wait(3)
     # PhantomJS의 경우 | 아까 받은 PhantomJS의 위치를 지정해준다.
     # driver = webdriver.PhantomJS(phantom_path)
@@ -41,4 +49,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    crawling()

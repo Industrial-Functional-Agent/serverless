@@ -17,3 +17,6 @@ cd $VIRTUALENV/lib/$PYTHON_VERSION/site-packages/
 zip -r9 ../../../../$ZIP_FILE *
 cd ../../../../
 zip -g $ZIP_FILE main.py
+zip -g $ZIP_FILE crawling.py
+zip -g $ZIP_FILE headless-chromium
+zip -g $ZIP_FILE chromedriver

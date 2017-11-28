@@ -2,3 +2,9 @@ chromedriver
 phantomjs-2.1.1-macosx
 headless-chromium
 *.log
+.DS_Store
+.idea
+venv_lambda
+JoongoToSlack*
+chromedriver-mac
+chromedriver.zip
