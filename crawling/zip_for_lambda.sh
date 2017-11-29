@@ -23,6 +23,7 @@ zip -r9 ../../../../$ZIP_FILE *
 cd ../../../../
 zip -g $ZIP_FILE main.py
 zip -g $ZIP_FILE crawling.py
+zip -g $ZIP_FILE post_process.py
 # zip -g $ZIP_FILE headless-chromium
 # zip -g $ZIP_FILE chromedriver
 zip -g -r9 $ZIP_FILE $PHANTOM

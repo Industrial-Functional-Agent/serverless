@@ -3,7 +3,9 @@ import json
 import logging
 
 from slackclient import SlackClient
-from crawling import crawling
+
+from crawling import Crawler
+from post_process import post_process
 
 
 # slack_channel = os.getenv('SLACK_CHANNEL')
@@ -41,11 +43,17 @@ class SlackBot:
 
 
 def handler(event, context):
+    crawler = Crawler()
+    crawler.load_phantom(os.path.join(os.getcwd(),
+                                      'phantomjs-2.1.1-linux-x86_64',
+                                      'bin',
+                                      'phantomjs'))
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
     logger.info("Event: " + str(event))
-    message = crawling()
+    message = crawler.crawling()
+    message = post_process(message)
     logger.info("Message: " + str(message))
 
     return message
