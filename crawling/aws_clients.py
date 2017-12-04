@@ -65,11 +65,10 @@ class LambdaClient(AWSClient):
     def function_code_zip_file_name(self):
         return self._function_code_zip_file_name
 
-    def invoke(self, plot_url):
+    def invoke(self):
         return self._client.invoke(
             FunctionName=self.function_name,
             InvocationType='Event',
-            Payload=json.dumps(dict(plot_url=plot_url)),
         )
 
     def _get_zipped_function_code(self):
@@ -93,7 +92,8 @@ class LambdaClient(AWSClient):
                 ZipFile=self._get_zipped_function_code(),
             ),
             Description='Sends crawled text to Slack',
-            Timeout=300,
+            Timeout=60,
+            MemorySize=512,
             Environment=dict(
                 Variables=env_variables,
             ),

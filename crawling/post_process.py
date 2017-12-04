@@ -19,7 +19,7 @@ def post_process(text):
 
         if is_macbook and is_pro:
             result.append({
-                'no': article_number,
+                'no': 'http://cafe.naver.com/joonggonara/{}'.format(article_number),
                 'title': article_title
             })
 

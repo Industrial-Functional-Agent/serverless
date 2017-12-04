@@ -23,10 +23,8 @@ def update_function():
     lambda_client.update_function_code()
 
 
-def invoke_function(plotly_url):
-    # Find test urls at https://plot.ly/feed/
-    # Try out: https://plot.ly/~matlab_user_guide/436
-    lambda_client.invoke(plotly_url)
+def invoke_function():
+    lambda_client.invoke()
 
 
 def delete_all_resources():
@@ -45,7 +43,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    create_function(
-        SLACK_CHANNEL=args.slack_channel,
-        SLACK_TOKEN=args.slack_token,
-    )
+    try:
+        create_function(
+            SLACK_CHANNEL=args.slack_channel,
+            SLACK_TOKEN=args.slack_token,
+        )
+    except:
+        update_function()
+
+    invoke_function()

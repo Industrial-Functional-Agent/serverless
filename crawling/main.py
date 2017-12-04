@@ -8,15 +8,15 @@ from crawling import Crawler
 from post_process import post_process
 
 
-# slack_channel = os.getenv('SLACK_CHANNEL')
-# slack_token = os.getenv('SLACK_TOKEN')
+slack_channel = os.getenv('SLACK_CHANNEL')
+slack_token = os.getenv('SLACK_TOKEN')
 
-# if slack_channel is None:
-#     raise Exception('Expected to find slack channel at environment variable \
-#                      SLACK_CHANNEL, found nothing')
-# if slack_token is None:
-#     raise Exception('Expected to find slack token at environment variable \
-#                      SLACK_TOKEN, found nothing')
+if slack_channel is None:
+    raise Exception('Expected to find slack channel at environment variable \
+                     SLACK_CHANNEL, found nothing')
+if slack_token is None:
+    raise Exception('Expected to find slack token at environment variable \
+                     SLACK_TOKEN, found nothing')
 
 
 class SlackBot:
@@ -25,7 +25,7 @@ class SlackBot:
         self.slack_client = SlackClient(slack_token)
 
     def upload_file(self, file, filename=None):
-        self.slack_client.api_call(
+        return self.slack_client.api_call(
             "files.upload",
             as_user=True,
             channels=self.channel,
@@ -34,10 +34,10 @@ class SlackBot:
         )
 
     def send_message(self, message):
-        self.slack_client.api_call(
+        return self.slack_client.api_call(
             'chat.postMessage',
             as_user=True,
-            channels=self.channel,
+            channel=self.channel,
             text=message,
         )
 
@@ -56,7 +56,8 @@ def handler(event, context):
     message = post_process(message)
     logger.info("Message: " + str(message))
 
-    return message
+    if message:
+        bot = SlackBot(slack_channel)
+        a = bot.send_message(str(message))
 
-    # bot = SlackBot(slack_channel)
-    # bot.send_message(message)
+        return a
