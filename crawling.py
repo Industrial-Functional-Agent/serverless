@@ -33,7 +33,26 @@ class Crawler:
 
         self.driver = driver
 
-    def crawling(self):
+    def crawling(self, article_page_num):
+        """
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=1
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=2
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=3
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=4
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=5
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=6
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=7
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=8
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=9
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=10
+        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=11
+
+        doc = document.getElementById('cafe_main').contentDocument;
+        t = doc.getElementsByClassName("Nnavi")[0]
+        td = t.getElementsByTagName("td")[3]
+        td.getElementsByTagName("a")[0].click()
+        """
+
         assert self.driver is not None
 
         # self.driver.implicitly_wait(3)
