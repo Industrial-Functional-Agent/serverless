@@ -1,4 +1,5 @@
 import argparse
+import json
 from aws_clients import LambdaClient, IamClient
 
 
@@ -33,22 +34,14 @@ def delete_all_resources():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--slack-channel', type=str, required=True,
-                        help="A Slack channel that will receive url")
-    parser.add_argument('--slack-token', type=str, required=True,
-                        help="A Slack token with permissions to post to the \
-                              slack_channel. recommended: \
-                              [bot users](https://api.slack.com/bot-users)")
-
-    args = parser.parse_args()
-
-    try:
-        create_function(
-            SLACK_CHANNEL=args.slack_channel,
-            SLACK_TOKEN=args.slack_token,
-        )
-    except:
-        update_function()
+    with open('slack_config.json', 'r') as f:
+        slack_config = json.load(f)
+        try:
+            create_function(
+                SLACK_CHANNEL=slack_config['slack-channel'],
+                SLACK_TOKEN=slack_config['slack-token'],
+            )
+        except:
+            update_function()
 
     invoke_function()
