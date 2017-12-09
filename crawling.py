@@ -33,7 +33,7 @@ class Crawler:
 
         self.driver = driver
 
-    def crawling(self, article_page_num):
+    def crawling(self, article_page_num=1):
         """
         /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=1
         /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=2

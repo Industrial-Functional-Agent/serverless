@@ -1,5 +1,7 @@
 import re
 
+from models import Post
+
 
 def post_process(text):
     delete_useless_korean = text.replace('퍼스나콘/아이디', '')
@@ -18,9 +20,6 @@ def post_process(text):
                                                               article_title)
 
         if is_macbook and is_pro:
-            result.append({
-                'no': 'http://cafe.naver.com/joonggonara/{}'.format(article_number),
-                'title': article_title
-            })
+            result.append(Post('http://cafe.naver.com/joonggonara/{}'.format(article_number), article_title))
 
     return result

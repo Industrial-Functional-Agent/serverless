@@ -87,11 +87,12 @@ def handler(event, context):
 
     logger.info("Event: " + str(event))
     message = crawler.crawling()
-    message = post_process(message)
-    logger.info("Message: " + str(message))
+    posts = post_process(message)
+    text = "\n".join(map(str, posts))
+    logger.info("Message: " + text)
 
     if message:
         bot = SlackBot(slack_channel)
-        a = bot.send_message(str(message))
+        a = bot.send_message(text)
 
         return a
