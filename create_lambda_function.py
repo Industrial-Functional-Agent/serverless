@@ -1,15 +1,15 @@
-import argparse
 import json
-from aws_clients import LambdaClient, IamClient
 
+from aws_clients import LambdaClient, IamClient, CloudWatchEventsClient
 
-# We assume that you have followed the instructions in 
+# We assume that you have followed the instructions in
 # http://boto3.readthedocs.io/en/latest/guide/configuration.html to 
 # configure your AWS credentials. If for some reason this does not work 
 # for you, passing aws_access_key_id and aws_secret_access_key directly 
 # as named arguments should work.
 lambda_client = LambdaClient()
 iam_client = IamClient()
+event_client = CloudWatchEventsClient()
 
 
 def create_function(**environment_variables):
@@ -44,4 +44,9 @@ if __name__ == "__main__":
         except:
             update_function()
 
-    invoke_function()
+        function_config = lambda_client.get_function_configuration()
+        event_client.create_rule(rate=2)
+        event_client.put_targets(function_config)
+        lambda_client.add_permission(function_config)
+
+    # invoke_function()

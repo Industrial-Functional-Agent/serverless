@@ -103,3 +103,56 @@ class LambdaClient(AWSClient):
         return self._client.delete_function(
             FunctionName=self.function_name,
         )
+
+    def get_function(self):
+        return self._client.get_function(
+            FunctionName=self.function_name,
+        )
+
+    def get_function_configuration(self):
+        return self._client.get_function_configuration(
+            FunctionName=self.function_name,
+        )
+
+    def add_permission(self, function_config):
+        return self._client.add_permission(
+            FunctionName=function_config['FunctionName'],
+            StatementId='AnyUniqueString',
+            Action='lambda:InvokeFunction',
+            Principal='events.amazonaws.com',
+            # SourceArn='string',
+        )
+
+
+class CloudWatchEventsClient(AWSClient):
+    def __init__(self, *args, **kwargs):
+        super().__init__('events', *args, **kwargs)
+        self.rule_name = 'JoongoToSlack'
+
+    def create_rule(self, rate, role=None):
+        return self._client.put_rule(
+            Name=self.rule_name,
+            ScheduleExpression='rate({} minutes)'.format(rate),
+            State='ENABLED',
+            # RoleArn=role['Role']['Arn'],
+        )
+
+    def put_targets(self, function_config):
+        return self._client.put_targets(
+            Rule='JoongoToSlack',
+            Targets=[
+                {
+                    'Id': function_config['FunctionName'],
+                    'Arn': function_config['FunctionArn'],
+                    # 'RoleArn': function_config['Role']['Arn'],
+                },
+            ]
+        )
+
+    def remove_targets(self, function_config):
+        return self._client.remove_targets(
+            Rule='JoongoToSlack',
+            Ids=[
+                function_config['FunctionName'],
+            ]
+        )
