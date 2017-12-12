@@ -42,39 +42,6 @@ class SlackBot:
             text=message,
         )
 
-client = boto3.client('dynamodb')
-table_name = 'JoongoToSlack'
-
-
-def get_latest_post_id():
-    resp = client.get_item(
-        TableName=table_name,
-        Key={
-            'id': {
-                'S': 'latest_post_id'
-            }
-        }
-    )
-    return resp['Item']['value']['N']  # str
-
-
-def update_latest_post_id(post_id):
-    client.update_item(
-        TableName=table_name,
-        Key={
-            'id': {
-                'S': "latest_post_id"
-            }
-        },
-        AttributeUpdates={
-            'value': {
-                'Value': {
-                    'N': str(post_id)
-                }
-            }
-        }
-    )
-
 
 def handler(event, context):
     crawler = Crawler()

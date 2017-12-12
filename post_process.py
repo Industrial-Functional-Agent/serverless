@@ -1,6 +1,11 @@
+import logging
 import re
 
+from aws_clients import DynamoDBClient
 from models import Post
+
+
+dynamo_db_client = DynamoDBClient()
 
 
 def post_process(text):
@@ -9,7 +14,7 @@ def post_process(text):
 
     split_by_tab = [article.replace('\n\n', '').split('\t') for article in split_by_article]
 
-    result = []
+    posts = []
     for article in split_by_tab[:-1]:
         article_number = article[0]
         article_title = article[1]
@@ -20,6 +25,17 @@ def post_process(text):
                                                               article_title)
 
         if is_macbook and is_pro:
-            result.append(Post('http://cafe.naver.com/joonggonara/{}'.format(article_number), article_title))
+            posts.append(Post(int(article_number), article_title))
 
-    return result
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    old_latest_post_id = dynamo_db_client.get_latest_post_id()
+    logger.info("old_latest_post_id: {}".format(old_latest_post_id))
+
+    if len(posts) > 0:
+        new_latest_post_id = max([post.number for post in posts])
+        logger.info("new_latest_post_id: {}".format(new_latest_post_id))
+        dynamo_db_client.update_latest_post_id(new_latest_post_id)
+
+    return [post for post in posts if post.number > old_latest_post_id]
