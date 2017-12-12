@@ -156,37 +156,3 @@ class CloudWatchEventsClient(AWSClient):
                 function_config['FunctionName'],
             ]
         )
-
-
-class DynamoDBClient(AWSClient):
-    def __init__(self, *args, **kwargs):
-        super().__init__('dynamodb', *args, **kwargs)
-        self.table_name = 'JoongoToSlack'
-
-    def get_latest_post_id(self):
-        resp = self._client.get_item(
-            TableName=self.table_name,
-            Key={
-                'id': {
-                    'S': 'latest_post_id'
-                }
-            }
-        )
-        return int(resp['Item']['value']['N'])  # str
-
-    def update_latest_post_id(self, post_id):
-        self._client.update_item(
-            TableName=self.table_name,
-            Key={
-                'id': {
-                    'S': "latest_post_id"
-                }
-            },
-            AttributeUpdates={
-                'value': {
-                    'Value': {
-                        'N': str(post_id)
-                    }
-                }
-            }
-        )
