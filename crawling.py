@@ -34,25 +34,6 @@ class Crawler:
         self.driver = driver
 
     def crawling(self, article_page_num=1):
-        """
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=1
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=2
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=3
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=4
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=5
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=6
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=7
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=8
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=9
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=10
-        /ArticleList.nhn?search.clubid=10050146&search.menuid=334&search.boardtype=L&search.questionTab=A&search.totalCount=151&search.page=11
-
-        doc = document.getElementById('cafe_main').contentDocument;
-        t = doc.getElementsByClassName("Nnavi")[0]
-        td = t.getElementsByTagName("td")[3]
-        td.getElementsByTagName("a")[0].click()
-        """
-
         assert self.driver is not None
 
         # self.driver.implicitly_wait(3)
@@ -72,11 +53,27 @@ class Crawler:
         };
         """.replace('\n', '').replace('let', 'var')
 
-        self.driver.execute_script(script)
-        text = self.driver.execute_script('return window.myFunc();')
-        self.driver.close()
+        text = ''
+        for i in range(10):
+            self.move_article_page(i)
+            self.driver.execute_script(script)
+            text += self.driver.execute_script('return window.myFunc();')
 
+        self.driver.close()
         return text
+
+    def move_article_page(self, article_page_num=1):
+        script = """
+        window.myFunc = function(i) {
+            let doc = document.getElementById('cafe_main').contentDocument;
+            let t = doc.getElementsByClassName("Nnavi")[0];
+            let td = t.getElementsByTagName("td")[i];
+            td.getElementsByTagName("a")[0].click();
+        };
+        """.replace('\n', '').replace('let', 'var')
+
+        self.driver.execute_script(script)
+        self.driver.execute_script('window.myFunc({});'.format(article_page_num))
 
 
 if __name__ == '__main__':
