@@ -1,13 +1,8 @@
-import os
-import json
 import logging
-
-import boto3
-from slackclient import SlackClient
+import os
 
 from crawling import Crawler
-from post_process import post_process
-
+from slack_bot import SlackBot
 
 slack_channel = os.getenv('SLACK_CHANNEL')
 slack_token = os.getenv('SLACK_TOKEN')
@@ -20,32 +15,10 @@ if slack_token is None:
                      SLACK_TOKEN, found nothing')
 
 
-class SlackBot:
-    def __init__(self, channel):
-        self.channel = channel
-        self.slack_client = SlackClient(slack_token)
-
-    def upload_file(self, file, filename=None):
-        return self.slack_client.api_call(
-            "files.upload",
-            as_user=True,
-            channels=self.channel,
-            filename=filename,
-            file=file,
-        )
-
-    def send_message(self, message):
-        return self.slack_client.api_call(
-            'chat.postMessage',
-            as_user=True,
-            channel=self.channel,
-            text=message,
-        )
-
-
 def handler(event, context):
     crawler = Crawler()
     crawler.load_phantom(os.path.join(os.getcwd(),
+                                      'phantomjs',
                                       'phantomjs-2.1.1-linux-x86_64',
                                       'bin',
                                       'phantomjs'))
@@ -53,13 +26,12 @@ def handler(event, context):
     logger.setLevel(logging.INFO)
 
     logger.info("Event: " + str(event))
-    message = crawler.crawling()
-    posts = post_process(message)
+    posts = crawler.crawling()
     text = "\n".join(map(str, posts))
     logger.info("Message: " + text)
 
-    if message:
-        bot = SlackBot(slack_channel)
+    if posts:
+        bot = SlackBot(slack_token, slack_channel)
         a = bot.send_message(text)
 
         return a

@@ -1,12 +1,13 @@
-import boto3
 import json
 
+import boto3
 from botocore.exceptions import ClientError
 
 
 class AWSClient:
     def __init__(self, client_name, *args, **kwargs):
-        self._client = boto3.client(client_name, *args, **kwargs)
+        self.session = boto3.Session(profile_name='ifa')
+        self._client = self.session.client(client_name, *args, **kwargs)
 
 
 class IamClient(AWSClient):
@@ -99,6 +100,14 @@ class LambdaClient(AWSClient):
             ),
         )
 
+    def update_function_configuration(self, **env_variables):
+        return self._client.update_function_configuration(
+            FunctionName=self.function_name,
+            Environment=dict(
+                Variables=env_variables,
+            ),
+        )
+
     def delete_function(self):
         return self._client.delete_function(
             FunctionName=self.function_name,
@@ -114,9 +123,9 @@ class LambdaClient(AWSClient):
             FunctionName=self.function_name,
         )
 
-    def add_permission(self, function_config):
+    def add_permission(self):
         return self._client.add_permission(
-            FunctionName=function_config['FunctionName'],
+            FunctionName=self.function_name,
             StatementId='AnyUniqueString',
             Action='lambda:InvokeFunction',
             Principal='events.amazonaws.com',
@@ -137,9 +146,24 @@ class CloudWatchEventsClient(AWSClient):
             # RoleArn=role['Role']['Arn'],
         )
 
+    def enable_rule(self):
+        return self._client.enable_rule(
+            Name=self.rule_name,
+        )
+
+    def disable_rule(self):
+        return self._client.disable_rule(
+            Name=self.rule_name,
+        )
+
+    def delete_rule(self):
+        return self._client.delete_rule(
+            Name=self.rule_name,
+        )
+
     def put_targets(self, function_config):
         return self._client.put_targets(
-            Rule='JoongoToSlack',
+            Rule=self.rule_name,
             Targets=[
                 {
                     'Id': function_config['FunctionName'],
@@ -149,10 +173,10 @@ class CloudWatchEventsClient(AWSClient):
             ]
         )
 
-    def remove_targets(self, function_config):
+    def remove_targets(self, function_name):
         return self._client.remove_targets(
-            Rule='JoongoToSlack',
+            Rule=self.rule_name,
             Ids=[
-                function_config['FunctionName'],
+                function_name,
             ]
         )

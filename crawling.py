@@ -1,13 +1,16 @@
+import logging
 import os
+import re
 
 from selenium import webdriver
 
-from post_process import post_process
+from models import Post
 
 
 class Crawler:
-    def __init__(self):
+    def __init__(self, menu_link='menuLink334'):
         self.driver = None
+        self.menu_link = menu_link
 
     def load_chrome(self, chrome_driver, chrome=None):
         chrome_path = os.path.join(os.getcwd(), chrome_driver)
@@ -33,17 +36,13 @@ class Crawler:
 
         self.driver = driver
 
-    def crawling(self, article_page_num=1):
+    def crawling(self):
         assert self.driver is not None
 
-        # self.driver.implicitly_wait(3)
         self.driver.get('http://cafe.naver.com/joonggonara.cafe')
-        # 맥북/노트북 탭으로 들어감
-
         if type(self.driver) == webdriver.Chrome:
             self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-
-        self.driver.find_element_by_id('menuLink334').click()
+        self.driver.find_element_by_id(self.menu_link).click()
         script = """
         window.myFunc = function() {
             let doc = document.getElementById('cafe_main').contentDocument;
@@ -53,14 +52,15 @@ class Crawler:
         };
         """.replace('\n', '').replace('let', 'var')
 
-        text = ''
+        post = []
         for i in range(10):
             self.move_article_page(i)
             self.driver.execute_script(script)
-            text += self.driver.execute_script('return window.myFunc();')
+            text = self.driver.execute_script('return window.myFunc();')
+            post += self.post_process(text)
 
         self.driver.close()
-        return text
+        return post
 
     def move_article_page(self, article_page_num=1):
         script = """
@@ -75,10 +75,49 @@ class Crawler:
         self.driver.execute_script(script)
         self.driver.execute_script('window.myFunc({});'.format(article_page_num))
 
+    def post_process(self, text):
+        delete_useless_korean = text.replace('퍼스나콘/아이디', '')
+        split_by_article = re.split(r'\t[0-9]+\n', delete_useless_korean)
+
+        split_by_tab = [article.replace('\n\n', '').split('\t') for article in split_by_article]
+
+        posts = []
+        for article in split_by_tab[:-1]:
+            article_number = article[0]
+            article_title = article[1]
+
+            is_macbook = article_title.find('맥북') != -1 or re.findall('[mM][aA][cC]',
+                                                                      article_title)
+            is_pro = article_title.find('프로') != -1 or re.findall('[pP][rR][oO]',
+                                                                  article_title)
+
+            if is_macbook and is_pro:
+                posts.append(Post(menu_link=self.menu_link,
+                                  number=int(article_number),
+                                  title=article_title))
+
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+
+        old_latest_post_id = Post.get_latest_number(menu_link=self.menu_link)
+        logger.info("old_latest_post_id: {}".format(old_latest_post_id))
+
+        if len(posts) > 0:
+            new_latest_post_id = max([post.number for post in posts])
+            logger.info("new_latest_post_id: {}".format(new_latest_post_id))
+            for post in posts:
+                if post.number > old_latest_post_id:
+                    post.save()
+
+        return [post for post in posts if post.number > old_latest_post_id]
+
 
 if __name__ == '__main__':
     crawler = Crawler()
-    crawler.load_chrome(os.path.join(os.getcwd(), 'chromedriver-mac'))
-    text = crawler.crawling()
-    text = post_process(text)
+    crawler.load_phantom(os.path.join(os.getcwd(),
+                                      'phantomjs',
+                                      'phantomjs-2.1.1-macosx',
+                                      'bin',
+                                      'phantomjs'))
+    text = str(crawler.crawling())
     print(text)

@@ -9,11 +9,14 @@ class Post(Model):
 
     @staticmethod
     def get_latest_number(menu_link):
-        return list(Post.query(hash_key=menu_link, scan_index_forward=False, limit=1))[0].number
+        return list(Post.query(hash_key=menu_link,
+                               scan_index_forward=False,
+                               limit=1))[0].number
 
     menu_link = UnicodeAttribute(hash_key=True)  # menuLink334
     number = NumberAttribute(range_key=True)
     title = UnicodeAttribute()
 
-    # def __str__(self):
-    #     return 'http://cafe.naver.com/joonggonara/{}\t{}'.format(self.number, self.title)
+    def __str__(self):
+        return 'http://cafe.naver.com/joonggonara/{}\t{}'.format(self.number,
+                                                                 self.title)
