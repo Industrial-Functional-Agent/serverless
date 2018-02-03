@@ -18,8 +18,6 @@ if slack_token is None:
 def handler(event, context):
     crawler = Crawler()
     crawler.load_phantom(os.path.join(os.getcwd(),
-                                      'phantomjs',
-                                      'phantomjs-2.1.1-linux-x86_64',
                                       'bin',
                                       'phantomjs'))
     logger = logging.getLogger()

@@ -24,12 +24,10 @@ aws --profile ifa lambda \
     --handler main.handler \
     --code S3Bucket=fakenerd,S3Key=${ZIP_FILE_NAME} \
     --environment "{\"Variables\":{\"SLACK_CHANNEL\":\"${SLACK_CHANNEL}\",\"SLACK_TOKEN\":\"${SLACK_TOKEN}\"}}" \
-    --query FunctionArn
 
 aws --profile ifa events \
     put-rule \
     --cli-input-json "{\"Name\": \"$EVENT_RULE_NAME\", \"ScheduleExpression\": \"rate(2 minutes)\"}" \
-    --query RuleArn
 
 FUNCTION_ARN=$(aws --profile ifa lambda \
     get-function-configuration \

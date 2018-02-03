@@ -1,4 +1,4 @@
-export ZIP_FILE='JoongoToSlack.zip'
+export ZIP_FILE='JoongonaraToSlack.zip'
 export PYTHON_VERSION='python3.6'
 export VIRTUALENV='venv_lambda'
 export PHANTOM='phantomjs/phantomjs-2.1.1-linux-x86_64'

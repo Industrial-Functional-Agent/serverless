@@ -1,11 +1,13 @@
 chromedriver
 phantomjs-2.1.1-macosx
+.serverless
 headless-chromium
 *.log
 .DS_Store
 .idea
 venv_lambda
 JoongoToSlack*
+JoongonaraToSlack*
 chromedriver-mac
 chromedriver.zip
 venv
@@ -16,3 +18,4 @@ phantomjs-2.1.1-linux-x86_64
 .vscode
 __pycache__
 slack_config.json
+node_modules
